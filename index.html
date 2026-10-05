@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Route Optimizer - Optimizador de Rutas de Entrega</title>
+    
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+    
+    <!-- Leaflet Routing Machine CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
+    
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Panel Izquierdo: Formulario -->
+        <div class="panel-left">
+            <div class="header">
+                <h1>📍 Route Optimizer</h1>
+                <p>Planifica tus entregas eficientemente</p>
+            </div>
+
+            <!-- Punto de Partida -->
+            <div class="form-section">
+                <h3>🏢 Punto de Partida</h3>
+                <div class="form-group">
+                    <label for="startAddress">Dirección de Inicio (Almacén/Bodega)</label>
+                    <input type="text" id="startAddress" placeholder="Ej: Cra 15 #45-20, Bogotá">
+                    <button id="searchStartBtn" class="btn-search">Buscar en Mapa</button>
+                </div>
+                <div id="startInfo" class="info-box" style="display:none;">
+                    <p id="startCoords"></p>
+                </div>
+            </div>
+
+            <!-- Agregar Entregas -->
+            <div class="form-section">
+                <h3>📦 Agregar Entrega</h3>
+                <div class="form-group">
+                    <label for="clientName">Nombre del Cliente</label>
+                    <input type="text" id="clientName" placeholder="Ej: Juan Pérez">
+                </div>
+                <div class="form-group">
+                    <label for="clientAddress">Dirección</label>
+                    <input type="text" id="clientAddress" placeholder="Ej: Cra 20 #50-15, Bogotá">
+                </div>
+                <div class="form-group">
+                    <label for="product">Producto</label>
+                    <input type="text" id="product" placeholder="Ej: Laptop, Paquete A, etc">
+                </div>
+                <div class="form-group">
+                    <label for="notes">Notas (opcional)</label>
+                    <textarea id="notes" placeholder="Ej: Entregar solo en persona, código 1234"></textarea>
+                </div>
+                <button id="addDeliveryBtn" class="btn-primary">+ Agregar Entrega</button>
+            </div>
+
+            <!-- Lista de Entregas -->
+            <div class="form-section">
+                <h3>📋 Entregas Agregadas</h3>
+                <div id="deliveriesList" class="deliveries-list">
+                    <p class="empty-msg">No hay entregas agregadas aún</p>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="form-section actions">
+                <button id="optimizeRouteBtn" class="btn-success" disabled>🚗 Calcular Ruta Óptima</button>
+                <button id="clearAllBtn" class="btn-danger">🗑️ Limpiar Todo</button>
+            </div>
+
+            <!-- Resultado de Ruta -->
+            <div id="routeResult" class="form-section" style="display:none;">
+                <h3>✅ Ruta Optimizada</h3>
+                <div id="routeDetails"></div>
+            </div>
+        </div>
+
+        <!-- Panel Derecho: Mapa -->
+        <div class="panel-right">
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <!-- Leaflet Routing Machine JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
+    
+    <!-- Nominatim (Geocoding) -->
+    <script src="https://nominatim.openstreetmap.org/js/nominatim.js"></script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
