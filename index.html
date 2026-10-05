@@ -1,98 +1,77 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Route Optimizer - Optimizador de Rutas de Entrega</title>
-    
-    <!-- Leaflet CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
-    
-    <!-- Leaflet Routing Machine CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.css" />
-    
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Route Optimizer Delivery</title>
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""
+  />
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css"
+  />
+
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <div class="container">
-        <!-- Panel Izquierdo: Formulario -->
-        <div class="panel-left">
-            <div class="header">
-                <h1>📍 Route Optimizer</h1>
-                <p>Planifica tus entregas eficientemente</p>
-            </div>
+  <div class="app">
+    <aside class="sidebar">
+      <h1>📍 Route Optimizer</h1>
+      <p class="subtitle">Planifica entregas y ahorra gasolina</p>
 
-            <!-- Punto de Partida -->
-            <div class="form-section">
-                <h3>🏢 Punto de Partida</h3>
-                <div class="form-group">
-                    <label for="startAddress">Dirección de Inicio (Almacén/Bodega)</label>
-                    <input type="text" id="startAddress" placeholder="Ej: Cra 15 #45-20, Bogotá">
-                    <button id="searchStartBtn" class="btn-search">Buscar en Mapa</button>
-                </div>
-                <div id="startInfo" class="info-box" style="display:none;">
-                    <p id="startCoords"></p>
-                </div>
-            </div>
+      <section class="card">
+        <h2>🏢 Punto de partida</h2>
+        <input id="startAddress" type="text" placeholder="Ej: Calle 80 # 10 - 20, Bogotá" />
+        <button id="searchStartBtn" class="btn-primary">Buscar en mapa</button>
+        <div id="startInfo" class="info-box hidden"></div>
+      </section>
 
-            <!-- Agregar Entregas -->
-            <div class="form-section">
-                <h3>📦 Agregar Entrega</h3>
-                <div class="form-group">
-                    <label for="clientName">Nombre del Cliente</label>
-                    <input type="text" id="clientName" placeholder="Ej: Juan Pérez">
-                </div>
-                <div class="form-group">
-                    <label for="clientAddress">Dirección</label>
-                    <input type="text" id="clientAddress" placeholder="Ej: Cra 20 #50-15, Bogotá">
-                </div>
-                <div class="form-group">
-                    <label for="product">Producto</label>
-                    <input type="text" id="product" placeholder="Ej: Laptop, Paquete A, etc">
-                </div>
-                <div class="form-group">
-                    <label for="notes">Notas (opcional)</label>
-                    <textarea id="notes" placeholder="Ej: Entregar solo en persona, código 1234"></textarea>
-                </div>
-                <button id="addDeliveryBtn" class="btn-primary">+ Agregar Entrega</button>
-            </div>
+      <section class="card">
+        <h2>📦 Nueva entrega</h2>
+        <input id="clientName" type="text" placeholder="Nombre del cliente" />
+        <input id="clientAddress" type="text" placeholder="Dirección del cliente" />
+        <input id="product" type="text" placeholder="Producto a entregar" />
+        <textarea id="notes" rows="3" placeholder="Notas opcionales"></textarea>
+        <button id="addDeliveryBtn" class="btn-success">Agregar entrega</button>
+      </section>
 
-            <!-- Lista de Entregas -->
-            <div class="form-section">
-                <h3>📋 Entregas Agregadas</h3>
-                <div id="deliveriesList" class="deliveries-list">
-                    <p class="empty-msg">No hay entregas agregadas aún</p>
-                </div>
-            </div>
-
-            <!-- Botones de Acción -->
-            <div class="form-section actions">
-                <button id="optimizeRouteBtn" class="btn-success" disabled>🚗 Calcular Ruta Óptima</button>
-                <button id="clearAllBtn" class="btn-danger">🗑️ Limpiar Todo</button>
-            </div>
-
-            <!-- Resultado de Ruta -->
-            <div id="routeResult" class="form-section" style="display:none;">
-                <h3>✅ Ruta Optimizada</h3>
-                <div id="routeDetails"></div>
-            </div>
+      <section class="card">
+        <h2>📋 Lista de entregas</h2>
+        <div id="deliveriesList" class="deliveries-list">
+          <p class="empty">No hay entregas agregadas.</p>
         </div>
+      </section>
 
-        <!-- Panel Derecho: Mapa -->
-        <div class="panel-right">
-            <div id="map"></div>
-        </div>
-    </div>
+      <section class="card actions">
+        <button id="calculateBtn" class="btn-route" disabled>🚗 Calcular ruta</button>
+        <button id="clearAllBtn" class="btn-danger">🗑️ Limpiar todo</button>
+      </section>
 
-    <!-- Leaflet JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
-    
-    <!-- Leaflet Routing Machine JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-routing-machine/3.2.12/leaflet-routing-machine.min.js"></script>
-    
-    <!-- Nominatim (Geocoding) -->
-    <script src="https://nominatim.openstreetmap.org/js/nominatim.js"></script>
-    
-    <script src="script.js"></script>
+      <section id="routeResult" class="card hidden">
+        <h2>✅ Ruta sugerida</h2>
+        <div id="routeSummary"></div>
+      </section>
+    </aside>
+
+    <main class="map-wrap">
+      <div id="map"></div>
+    </main>
+  </div>
+
+  <script
+    src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""
+  ></script>
+
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+  <script src="script.js"></script>
 </body>
 </html>
